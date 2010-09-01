@@ -13,7 +13,8 @@ module MediaMarker
       @agent = WWW::Mechanize.new
       @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
 
-      @search_uri = MediaMarkerTopURI+"/u/"+user_id+"/search9"
+      @search_uri = MediaMarkerTopURI+"u/"+user_id+"/search9"
+      @book_page_base = MediaMarkerTopURI+"u/"+user_id
       authentication(@agent, user_id, password)
     end
 
@@ -35,17 +36,24 @@ module MediaMarker
       result_page = search_form.submit
     end
 
-    def comment(asin, comment)
-      update_uri = BooklogHomeURI + '/addbook.php?mode=ItemLookup&asin='+asin
-      #p update_uri
-      comment_page = @agent.get(update_uri)
-      comment_form = comment_page.form('frm')
-      comment_form['comment'] = comment.toeuc
-      if $DEBUG
-        puts comment_form['comment']
+    # 'rank'    "0","1","2","3","4","5"
+    # 'status'  1:読みたい、2:いま読んでいる、3:読み終わった、4:積読
+    # 'read_at' Date
+    # 'description'
+    def edit(asin, edit_info)
+      book_page = @book_page_base + "?asin="+asin
+      tmp_page = @agent.get(book_page)
+      edit_page = tmp_page.link_with(:href => /#{@book_page_base}\/edit/).click
+      edit_form = edit_page.form(:name => "edit")
+
+      if edit_info['rank'] 
+        edit_form['rank'] = edit_info['rank']
       end
-      result_page = comment_form.submit
-      #puts result_page.body
+      if edit_info['description']
+        edit_form['comment'] = edit_info['description']
+      end
+      pp edit_form
+      edit_form.submit
     end
   end
 end
@@ -56,24 +64,28 @@ end
 
 if defined?($test) && $test
   require 'test/unit'
-  require 'ldblogwriter'
 
   class TestMediaMarker < Test::Unit::TestCase
     def setup
       # login idとpasswordを代入
-      lbw = LDBlogWriter::Blog.new
-      @config = LDBlogWriter::Config.new(ENV['HOME'] + "/.ldblogwriter.conf")
+      @user_id = "xxx"
+      @password = "yyy"
     end
 
     def test_authentication
-      MediaMarker::Agent.new(@config.options['mediamarker_userid'],
-                         @config.options['mediamarker_password'])
+      MediaMarker::Agent.new(@user_id, @password)
     end
 
     def test_search
-      agent = MediaMarker::Agent.new(@config.options['mediamarker_userid'],
-                                    @config.options['mediamarker_password'])
+      agent = MediaMarker::Agent.new(@user_id, @password)
       agent.search('4150705518')
+    end
+
+    def test_edit
+      agent = MediaMarker::Agent.new(@user_id, @password)
+      agent.edit('4488406114',
+                 {'rank'=>'3',
+                   'description' => "http://blog.livedoor.jp/masahino123/archives/65499644.html"})
     end
   end
 end
