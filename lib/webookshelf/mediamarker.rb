@@ -28,12 +28,17 @@ module MediaMarker
 
     # ISBNによる登録
     def search(isbn)
+	add(isbn)
+    end
+
+    def add(isbn)
       search_page = @agent.get(@search_uri)
       search_form = search_page.form_with(:action => 'search9')
       search_form['auto'] = 1
       search_form['q'] = isbn
 #      input_form.method = "POST"
       result_page = search_form.submit
+puts result_page
     end
 
     # 'rank'    "0","1","2","3","4","5"
@@ -68,21 +73,20 @@ if defined?($test) && $test
   class TestMediaMarker < Test::Unit::TestCase
     def setup
       # login idとpasswordを代入
-      @user_id = "xxx"
-      @password = "yyy"
+	load `pwd`.chomp+'/mediamarker_id.rb'
     end
 
     def test_authentication
-      MediaMarker::Agent.new(@user_id, @password)
+      MediaMarker::Agent.new($user_id, $password)
     end
 
     def test_search
-      agent = MediaMarker::Agent.new(@user_id, @password)
+      agent = MediaMarker::Agent.new($user_id, $password)
       agent.search('4150705518')
     end
 
     def test_edit
-      agent = MediaMarker::Agent.new(@user_id, @password)
+      agent = MediaMarker::Agent.new($user_id, $password)
       agent.edit('4488406114',
                  {'rank'=>'3',
                    'description' => "http://blog.livedoor.jp/masahino123/archives/65499644.html"})
