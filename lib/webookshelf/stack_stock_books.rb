@@ -15,7 +15,7 @@ module StackStockBooks
     # livedoor? or ...
     StackHomeURI = 'http://stack.nayutaya.jp'
     def initialize(stack_id, op_server, op_id, op_password)
-      @agent = WWW::Mechanize.new
+      @agent = Mechanize.new
       @stack_id = stack_id
       authentication(@agent, op_server, op_id, op_password)
     end

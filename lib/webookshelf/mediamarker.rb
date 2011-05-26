@@ -10,7 +10,7 @@ module MediaMarker
     MediaMarkerTopURI = 'http://mediamarker.net/'
 
     def initialize(user_id, password)
-      @agent = WWW::Mechanize.new
+      @agent = Mechanize.new
       @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
 
       @search_uri = MediaMarkerTopURI+"u/"+user_id+"/search9"
@@ -35,10 +35,10 @@ module MediaMarker
       search_page = @agent.get(@search_uri)
       search_form = search_page.form_with(:action => 'search9')
       search_form['auto'] = 1
-      search_form['q'] = isbn
-#      input_form.method = "POST"
+      search_form['code'] = isbn
+#      search_form.method = "POST"
       result_page = search_form.submit
-puts result_page
+pp result_page
     end
 
     # 'rank'    "0","1","2","3","4","5"
@@ -77,19 +77,19 @@ if defined?($test) && $test
     end
 
     def test_authentication
-      MediaMarker::Agent.new($user_id, $password)
+#      MediaMarker::Agent.new($user_id, $password)
     end
 
     def test_search
       agent = MediaMarker::Agent.new($user_id, $password)
-      agent.search('4150705518')
+      agent.search('4150309329')
     end
 
     def test_edit
       agent = MediaMarker::Agent.new($user_id, $password)
-      agent.edit('4488406114',
-                 {'rank'=>'3',
-                   'description' => "http://blog.livedoor.jp/masahino123/archives/65499644.html"})
+#      agent.edit('4488406114',
+#                 {'rank'=>'3',
+#                   'description' => "http://blog.livedoor.jp/masahino123/archives/65499644.html"})
     end
   end
 end
