@@ -10,7 +10,7 @@ module Booklog
     BooklogLoginURI = 'http://booklog.jp/login'
     BooklogInputURI = 'http://booklog.jp/input'
     def initialize(user_id, password)
-      @agent = WWW::Mechanize.new
+      @agent = Mechanize.new
       @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
 
       authentication(@agent, user_id, password)
