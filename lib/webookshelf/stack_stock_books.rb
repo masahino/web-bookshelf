@@ -114,9 +114,17 @@ if defined?($test) && $test
     end
 
     def test_get_book_list
-      api = StackStockBooks::API.new(@config.options['stack_id'],
-                                     @config.options['stack_api_token'])
-      pp api.get_book_list
+#      api = StackStockBooks::API.new(@config.options['stack_id'],
+#                                     @config.options['stack_api_token'])
+#      pp api.get_book_list
+    end
+
+    def test_edit_note
+      api = StackStockBooks::Agent.new(@config.options['stack_id'],
+                                       @config.options['stack_op_server'],
+                                       @config.options['stack_op_id'],
+                                       @config.options['stack_op_password'])
+      
     end
   end
 end

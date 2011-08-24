@@ -11,7 +11,7 @@ module Booklog
     BooklogInputURI = 'http://booklog.jp/input'
     def initialize(user_id, password)
       @agent = Mechanize.new
-      @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
+#      @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
 
       authentication(@agent, user_id, password)
     end
@@ -28,12 +28,13 @@ module Booklog
     # ISBNによる登録
     def input(isbn_list)
       input_page = @agent.get(BooklogInputURI)
-      input_form = input_page.form_with(:action => BooklogInputURI)
-      input_form['isbns'] = isbn_list.join("\n")
-      input_form['status'] = "3"
+#      input_form = input_page.form_with(:action => BooklogInputURI)
+#      input_form = input_page.form_with(:action => '/input')
+      input_form = input_page.form_with(:id => 'input_form')
+      input_form.isbns = isbn_list.join("\n")
+      input_form.status = "3"
       input_form.method = "POST"
       result_page = input_form.submit
-      pp result_page
     end
 
     def comment(asin, comment)

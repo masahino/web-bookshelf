@@ -11,7 +11,7 @@ module MediaMarker
 
     def initialize(user_id, password)
       @agent = Mechanize.new
-      @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
+#      @agent.post_connect_hooks << lambda{|params| params[:response_body] = NKF.nkf('-w8m0', params[:response_body])}
 
       @search_uri = MediaMarkerTopURI+"u/"+user_id+"/search9"
       @book_page_base = MediaMarkerTopURI+"u/"+user_id
