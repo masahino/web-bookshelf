@@ -58,7 +58,8 @@ module Booklog
       edit_path = '/edit/' + asin
       edit_uri = BooklogHomeURI + edit_path
       edit_page = @agent.get(edit_uri)
-      edit_form = edit_page.form(:action => edit_path)
+#      edit_form = edit_page.form(:action => edit_path)
+      edit_form = edit_page.forms[2]
       if edit_info['rank'] 
         edit_form['rank'] = edit_info['rank']
       end
@@ -73,7 +74,8 @@ module Booklog
       if edit_info['description']
         edit_form['description'] = edit_info['description']
       end
-      pp edit_form
+
+      edit_form.checkbox_with(:name => "create_on_now").check
       edit_form['_method'] = "edit"
       edit_form.submit
     end
@@ -86,27 +88,31 @@ end
 
 if defined?($test) && $test
   require 'test/unit'
-  require 'ldblogwriter'
 
   class TestBooklog < Test::Unit::TestCase
     def setup
       # login idとpasswordを代入
-      lbw = LDBlogWriter::Blog.new
-      @config = LDBlogWriter::Config.new(ENV['HOME'] + "/.ldblogwriter.conf")
+      @options = Hash.new
+      conf_file = ENV['HOME'] + "/.ldblogwriter.conf"
+      File.open(conf_file) do |f|
+        while line = f.gets
+          eval(line) #, binding)
+        end
+      end
     end
 
     def test_authentication
-      Booklog::Agent.new(@config.options['booklog_userid'], @config.options['booklog_password'])
+      Booklog::Agent.new(@options['booklog_userid'], @options['booklog_password'])
     end
 
     def test_input
-      agent = Booklog::Agent.new(@config.options['booklog_userid'], @config.options['booklog_password'])
+      agent = Booklog::Agent.new(@options['booklog_userid'], @options['booklog_password'])
 #      agent.input(['4480426280'])
 #      agent.input(['4062752638'])
     end
 
     def test_edit
-      agent = Booklog::Agent.new(@config.options['booklog_userid'], @config.options['booklog_password'])
+      agent = Booklog::Agent.new(@options['booklog_userid'], @options['booklog_password'])
       agent.edit('4575513652',
                  {'rank'=>'4',
                    'status' => '3', 

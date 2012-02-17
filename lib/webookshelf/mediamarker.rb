@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'rubygems'
 require 'pp'
+
 module MediaMarker
   class Agent
     require 'mechanize'
@@ -38,7 +39,7 @@ module MediaMarker
       search_form['code'] = isbn
 #      search_form.method = "POST"
       result_page = search_form.submit
-pp result_page
+
     end
 
     # 'rank'    "0","1","2","3","4","5"
@@ -57,7 +58,6 @@ pp result_page
       if edit_info['description']
         edit_form['comment'] = edit_info['description']
       end
-      pp edit_form
       edit_form.submit
     end
   end
